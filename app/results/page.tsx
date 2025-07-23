@@ -121,9 +121,21 @@ function SearchResults() {
 
       {tgvMaxTrains.length > 0 && (
         <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-green-700 font-medium">
-            ✅ {tgvMaxTrains.length} train{tgvMaxTrains.length > 1 ? 's' : ''} avec TGV MAX disponible{tgvMaxTrains.length > 1 ? 's' : ''}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-green-700 font-medium">
+              ✅ {tgvMaxTrains.length} train{tgvMaxTrains.length > 1 ? 's' : ''} avec TGV MAX disponible{tgvMaxTrains.length > 1 ? 's' : ''}
+            </p>
+            <button
+              onClick={() => setFilters({ ...filters, tgvMaxOnly: !filters.tgvMaxOnly })}
+              className={`text-sm px-3 py-1 rounded-full transition-colors ${
+                filters.tgvMaxOnly 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-white text-green-700 border border-green-600'
+              }`}
+            >
+              {filters.tgvMaxOnly ? 'Affichage TGV MAX' : 'Voir TGV MAX seulement'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -205,6 +217,11 @@ function applyFilters(trains: Train[], filters: SearchFilters): Train[] {
       const connections = train.connections?.length || 0
       return connections <= filters.maxConnections!
     })
+  }
+
+  // TGV MAX only filter
+  if (filters.tgvMaxOnly) {
+    filtered = filtered.filter(train => train.tgvMaxAvailable === true)
   }
 
   // Sort

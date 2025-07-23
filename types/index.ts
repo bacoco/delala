@@ -45,6 +45,7 @@ export interface SearchFilters {
   maxDuration?: number; // minutes
   maxConnections?: number;
   sortBy?: 'earliest' | 'fastest' | 'connections';
+  tgvMaxOnly?: boolean; // Filter to show only TGV MAX trains
 }
 
 export interface FavoriteRoute {

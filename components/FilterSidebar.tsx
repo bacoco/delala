@@ -67,6 +67,16 @@ export default function FilterSidebar({
     saveFilters(newFilters)
   }
 
+  const handleTgvMaxOnlyChange = (checked: boolean) => {
+    const newFilters = {
+      ...localFilters,
+      tgvMaxOnly: checked,
+    }
+    setLocalFilters(newFilters)
+    onFiltersChange(newFilters)
+    saveFilters(newFilters)
+  }
+
   const resetFilters = () => {
     const defaultFilters: SearchFilters = {
       sortBy: 'earliest',
@@ -137,6 +147,24 @@ export default function FilterSidebar({
                 <option value="fastest">Plus rapide</option>
                 <option value="connections">Moins de correspondances</option>
               </select>
+            </div>
+
+            {/* TGV MAX Only Filter */}
+            <div className="mb-6">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={localFilters.tgvMaxOnly || false}
+                  onChange={(e) => handleTgvMaxOnlyChange(e.target.checked)}
+                  className="rounded border-gray-300 text-sncf-red focus:ring-sncf-red mr-3"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  TGV MAX uniquement
+                </span>
+              </label>
+              <p className="text-xs text-gray-500 mt-1 ml-6">
+                Afficher seulement les trains avec places TGV MAX disponibles
+              </p>
             </div>
 
             {/* Time Range */}
@@ -215,13 +243,6 @@ export default function FilterSidebar({
             >
               Réinitialiser les filtres
             </button>
-
-            {/* TGV MAX Filter Tip */}
-            <div className="mt-4 p-3 bg-green-50 rounded-lg">
-              <p className="text-xs text-green-700">
-                💡 Les trains avec TGV MAX sont mis en évidence automatiquement
-              </p>
-            </div>
           </div>
         </div>
       </div>
