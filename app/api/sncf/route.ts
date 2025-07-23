@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { TrainSearchResponse, ApiError } from '@/types'
+import { TrainSearchResponse, ApiError, Train } from '@/types'
 import { getStationByName } from '@/lib/stations'
 import { setCachedData, getCachedData } from '@/lib/api'
 import { scrapeTrains } from '@/lib/services/sncf-connect-scraper'
+import { fetchTrainsFromAPI } from '@/lib/services/sncf-api-service'
+import { getRealFallbackTrains } from '@/lib/services/fallback-data'
 
 // Rate limiting
 const requestCounts = new Map<string, { count: number; resetTime: number }>()
@@ -78,10 +80,57 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedResponse)
     }
     
-    // Always use real data from SNCF Connect
-    console.log('Fetching real data from SNCF Connect...')
-    const trains = await scrapeTrains(departureStation, arrivalStation, new Date(date))
-    console.log(`Found ${trains.length} trains with real TGV MAX availability`)
+    // Try multiple approaches to get real data
+    let trains: Train[] = []
+    let dataSource = 'unknown'
+    
+    // Approach 1: Try web scraping
+    try {
+      console.log('Attempting to scrape data from SNCF Connect...')
+      trains = await scrapeTrains(departureStation, arrivalStation, new Date(date))
+      dataSource = 'scraper'
+      console.log(`Scraper found ${trains.length} trains`)
+    } catch (scrapingError) {
+      console.error('Scraping failed:', scrapingError)
+      
+      // Approach 2: Try API endpoints
+      try {
+        console.log('Falling back to API endpoints...')
+        trains = await fetchTrainsFromAPI(departureStation, arrivalStation, new Date(date))
+        dataSource = 'api'
+        console.log(`API found ${trains.length} trains`)
+      } catch (apiError) {
+        console.error('API fetch also failed:', apiError)
+      }
+    }
+    
+    // If we still have no trains, use realistic fallback data
+    if (trains.length === 0) {
+      console.log('Using fallback train schedules...')
+      trains = getRealFallbackTrains(from, to)
+      dataSource = 'fallback'
+      
+      // Add a warning to the response
+      if (trains.length > 0) {
+        // Add metadata to indicate this is fallback data
+        const response: TrainSearchResponse = {
+          trains,
+          searchDate: new Date(date),
+          route: {
+            departureStation,
+            arrivalStation,
+            date: new Date(date),
+          },
+          totalResults: trains.length,
+          warning: 'Attention : Les données en temps réel ne sont pas disponibles. Ces horaires sont basés sur les grilles horaires habituelles et peuvent ne pas refléter la disponibilité actuelle.',
+        }
+        
+        // Don't cache fallback data for long
+        setCachedData(cacheKey, response, 60000) // Only 1 minute cache
+        
+        return NextResponse.json(response)
+      }
+    }
 
     const response: TrainSearchResponse = {
       trains,

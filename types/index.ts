@@ -69,6 +69,7 @@ export interface TrainSearchResponse {
   searchDate: Date;
   route: Route;
   totalResults: number;
+  warning?: string; // Optional warning for fallback data
 }
 
 export interface ApiError {

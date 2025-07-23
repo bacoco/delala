@@ -69,7 +69,7 @@ export async function withRetry<T>(
 }
 
 // Cache for API responses
-const cache = new Map<string, { data: any; timestamp: number }>()
+const cache = new Map<string, { data: any; timestamp: number; duration?: number }>()
 const CACHE_DURATION = (parseInt(process.env.CACHE_TTL || '300') * 1000) || 5 * 60 * 1000 // Default 5 minutes
 
 export function getCachedData<T>(key: string): T | null {
@@ -79,7 +79,8 @@ export function getCachedData<T>(key: string): T | null {
     return null
   }
   
-  if (Date.now() - cached.timestamp > CACHE_DURATION) {
+  const cacheDuration = cached.duration || CACHE_DURATION
+  if (Date.now() - cached.timestamp > cacheDuration) {
     cache.delete(key)
     return null
   }
@@ -87,10 +88,11 @@ export function getCachedData<T>(key: string): T | null {
   return cached.data as T
 }
 
-export function setCachedData(key: string, data: any): void {
+export function setCachedData(key: string, data: any, duration?: number): void {
   cache.set(key, {
     data,
     timestamp: Date.now(),
+    duration: duration || CACHE_DURATION,
   })
 }
 
