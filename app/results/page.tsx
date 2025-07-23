@@ -5,16 +5,19 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { TrainSearchResponse, ApiError } from '@/types'
+import { TrainSearchResponse, ApiError, SearchFilters, Train } from '@/types'
 import { searchTrains, formatApiError } from '@/lib/api'
+import { loadFilters } from '@/lib/storage'
 import TrainCard from '@/components/TrainCard'
 import LoadingResults from '@/components/LoadingResults'
+import FilterSidebar from '@/components/FilterSidebar'
 
 function SearchResults() {
   const searchParams = useSearchParams()
   const [results, setResults] = useState<TrainSearchResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [filters, setFilters] = useState<SearchFilters>(() => loadFilters() || { sortBy: 'earliest' })
 
   const from = searchParams.get('from') || ''
   const to = searchParams.get('to') || ''
@@ -83,7 +86,9 @@ function SearchResults() {
     )
   }
 
-  const tgvMaxTrains = results.trains.filter(train => train.tgvMaxAvailable)
+  // Apply filters to trains
+  const filteredTrains = applyFilters(results.trains, filters)
+  const tgvMaxTrains = filteredTrains.filter(train => train.tgvMaxAvailable)
   const searchDate = new Date(date)
 
   return (
@@ -108,14 +113,41 @@ function SearchResults() {
         </div>
       )}
 
-      <div className="grid gap-4">
-        {results.trains.map((train, index) => (
-          <TrainCard
-            key={`${train.trainNumber}-${index}`}
-            train={train}
-            route={results.route}
+      <div className="grid md:grid-cols-4 gap-6">
+        <div className="md:col-span-1">
+          <FilterSidebar
+            filters={filters}
+            onFiltersChange={setFilters}
+            trainCount={results.trains.length}
+            filteredCount={filteredTrains.length}
           />
-        ))}
+        </div>
+        
+        <div className="md:col-span-3">
+          {filteredTrains.length === 0 ? (
+            <div className="card p-6 text-center">
+              <p className="text-gray-600 mb-4">
+                Aucun train ne correspond aux filtres sélectionnés.
+              </p>
+              <button
+                onClick={() => setFilters({ sortBy: 'earliest' })}
+                className="btn-secondary"
+              >
+                Réinitialiser les filtres
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {filteredTrains.map((train, index) => (
+                <TrainCard
+                  key={`${train.trainNumber}-${index}`}
+                  train={train}
+                  route={results.route}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mt-8 text-center text-sm text-gray-500">
@@ -128,6 +160,58 @@ function SearchResults() {
       </div>
     </div>
   )
+}
+
+// Filter and sort trains
+function applyFilters(trains: Train[], filters: SearchFilters): Train[] {
+  let filtered = [...trains]
+
+  // Time range filter
+  if (filters.timeRange?.start || filters.timeRange?.end) {
+    filtered = filtered.filter(train => {
+      const departureTime = train.departureTime
+      if (filters.timeRange?.start && departureTime < filters.timeRange.start) {
+        return false
+      }
+      if (filters.timeRange?.end && departureTime > filters.timeRange.end) {
+        return false
+      }
+      return true
+    })
+  }
+
+  // Duration filter
+  if (filters.maxDuration) {
+    filtered = filtered.filter(train => train.duration <= filters.maxDuration!)
+  }
+
+  // Connections filter
+  if (filters.maxConnections !== undefined) {
+    filtered = filtered.filter(train => {
+      const connections = train.connections?.length || 0
+      return connections <= filters.maxConnections!
+    })
+  }
+
+  // Sort
+  switch (filters.sortBy) {
+    case 'fastest':
+      filtered.sort((a, b) => a.duration - b.duration)
+      break
+    case 'connections':
+      filtered.sort((a, b) => {
+        const aConnections = a.connections?.length || 0
+        const bConnections = b.connections?.length || 0
+        return aConnections - bConnections
+      })
+      break
+    case 'earliest':
+    default:
+      filtered.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
+      break
+  }
+
+  return filtered
 }
 
 export default function ResultsPage() {
