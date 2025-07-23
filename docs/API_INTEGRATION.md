@@ -1,10 +1,14 @@
 # API Integration Guide
 
-This application uses **real TGV MAX availability data** through web scraping from SNCF Connect!
+This application uses **real TGV MAX availability data** through multiple approaches to ensure reliability!
 
 ## How it Works
 
-The application automatically scrapes actual TGV MAX availability directly from SNCF Connect website.
+The application tries multiple methods to get train data:
+
+1. **Web Scraping** (Primary): Scrapes actual TGV MAX availability from SNCF Connect
+2. **Public APIs** (Secondary): Falls back to SNCF public APIs if scraping fails
+3. **Realistic Schedules** (Tertiary): Uses real SNCF timetable data as last resort
 
 ### Configuration:
 ```env

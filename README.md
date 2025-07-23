@@ -275,8 +275,24 @@ Ce projet a été développé en 4 phases sur 1 semaine :
 - **Responsive design** : Mobile-first avec breakpoints Tailwind
 - **Docker optimisé** : Multi-stage build avec support Chromium intégré
 
+## 🚨 Troubleshooting
+
+### "Impossible de récupérer les données depuis SNCF Connect"
+L'application essaie plusieurs méthodes pour obtenir les données :
+1. Scraping du site SNCF Connect
+2. APIs publiques SNCF
+3. Horaires réalistes basés sur les grilles SNCF
+
+Si vous voyez un avertissement jaune, les données affichées sont basées sur les horaires habituels mais restent utiles pour planifier.
+
+### Améliorer la fiabilité
+- Utilisez Docker pour un environnement stable
+- Vérifiez votre connexion internet
+- Réessayez après quelques secondes
+- Les résultats sont mis en cache pendant 5 minutes
+
 ---
 
 *Generated with ❤️ by [BACO](https://github.com/bacoco/BACO) - Basic Adaptive Context Orchestrator*
-*Project developed in 4 phases with automated Git commits and testing*
+*Project developed in 5 phases with automated Git commits and testing*
 *2025-01-23*
