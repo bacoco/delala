@@ -66,6 +66,9 @@ temp/
 
 # Test scripts
 test-scraper.js
+quick-test.js
+debug-scraper.js
+test-simple-scraper.js
 
 # Package lock files (keep one based on preference)
 # For this project, we'll use npm
