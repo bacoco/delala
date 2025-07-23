@@ -1,22 +1,14 @@
 # API Integration Guide
 
-This application now supports **real TGV MAX availability data** through web scraping! You can also integrate with various APIs for additional features.
+This application uses **real TGV MAX availability data** through web scraping from SNCF Connect!
 
-## Option 0: Web Scraping (NEW! - Real TGV MAX Data)
+## How it Works
 
-Get actual TGV MAX availability directly from SNCF Connect website.
-
-### Setup:
-1. Copy `.env.example` to `.env`
-2. Set `NEXT_PUBLIC_USE_MOCK_DATA=false`
-3. Restart the application
+The application automatically scrapes actual TGV MAX availability directly from SNCF Connect website.
 
 ### Configuration:
 ```env
-# Enable real data scraping
-NEXT_PUBLIC_USE_MOCK_DATA=false
-
-# Scraper settings
+# Scraper settings (optional - defaults work fine)
 SNCF_CONNECT_HEADLESS=true      # Run browser in headless mode
 SNCF_CONNECT_TIMEOUT=30000      # Page load timeout (ms)
 CACHE_TTL=300                   # Cache duration (seconds)
@@ -25,7 +17,6 @@ CACHE_TTL=300                   # Cache duration (seconds)
 ### Features:
 - ✅ Real TGV MAX availability badges
 - ✅ Actual train schedules and prices
-- ✅ Automatic fallback to mock data on errors
 - ✅ 5-minute result caching
 - ✅ Docker support with Chromium included
 
@@ -102,18 +93,14 @@ For accurate TGV MAX data, you would need to:
 2. Use the official SNCF mobile app API (reverse engineering required)
 3. Partner directly with SNCF
 
-## Quick Start with Real Data
+## Alternative APIs
 
-1. Copy `.env.example` to `.env`
-2. Add your API credentials
-3. Update `/app/api/sncf/route.ts` to call the real API instead of `generateMockTrains()`
-4. Map the API response to our `Train` interface
-5. Test with: `npm run dev`
+While the app uses web scraping by default, you can also integrate with these APIs for additional features:
 
-## Example API Response Mapping
+### Example API Response Mapping
 
 ```typescript
-// Navitia response to our Train interface
+// Example: Navitia response to our Train interface
 function mapNavitiaToTrain(journey: any): Train {
   return {
     trainNumber: journey.sections[0].display_informations?.headsign || 'Unknown',
@@ -123,7 +110,7 @@ function mapNavitiaToTrain(journey: any): Train {
     duration: journey.duration / 60, // Convert seconds to minutes
     stops: journey.nb_transfers,
     platform: journey.sections[0].stop_point_departure?.platform,
-    tgvMaxAvailable: detectTGVMaxAvailability(journey),
+    tgvMaxAvailable: false, // Would need additional logic
     price: undefined, // Not provided by Navitia
   }
 }

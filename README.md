@@ -26,8 +26,8 @@ Cette Web Application a été générée par BACO (Basic Adaptive Context Orches
 - ✅ **Support Docker**: Containerisation complète avec Chromium pour le scraping
 - ✅ **Tests complets**: 90 tests unitaires avec couverture complète
 
-### 🆕 Données réelles TGV MAX
-L'application peut maintenant récupérer les vraies disponibilités TGV MAX directement depuis le site SNCF Connect !
+### 🔥 Données 100% réelles
+L'application récupère les vraies disponibilités TGV MAX directement depuis le site SNCF Connect - pas de données fictives !
 
 ## 🏃‍♂️ Quick Start
 
@@ -46,11 +46,8 @@ cd delala
 # Install dependencies
 npm install
 
-# Set up environment variables
+# Set up environment variables (optional)
 cp .env.example .env
-
-# For real TGV MAX data (recommended):
-# Edit .env and set NEXT_PUBLIC_USE_MOCK_DATA=false
 
 # Run development server
 npm run dev
@@ -265,7 +262,7 @@ Ce projet a été développé en 4 phases sur 1 semaine :
 - ✅ Web scraping avec Puppeteer
 - ✅ Extraction des vraies disponibilités TGV MAX
 - ✅ Support Docker avec Chromium
-- ✅ Fallback automatique sur mock data
+- ✅ Suppression complète des données fictives
 
 ## 🎯 Points Techniques Notables
 
@@ -274,7 +271,7 @@ Ce projet a été développé en 4 phases sur 1 semaine :
 - **Gestion d'état locale** : localStorage pour persistence offline
 - **Détection TGV MAX réelle** : Extraction directe depuis SNCF Connect
 - **Rate limiting** : Protection API avec cache configurable
-- **Error boundaries** : Gestion gracieuse des erreurs avec fallback
+- **Error boundaries** : Gestion gracieuse des erreurs
 - **Responsive design** : Mobile-first avec breakpoints Tailwind
 - **Docker optimisé** : Multi-stage build avec support Chromium intégré
 

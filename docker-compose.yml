@@ -12,7 +12,6 @@ services:
       - NEXT_PUBLIC_APP_NAME=TGV MAX Checker
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
       # Web scraping configuration
-      - NEXT_PUBLIC_USE_MOCK_DATA=false
       - SNCF_CONNECT_HEADLESS=true
       - SNCF_CONNECT_TIMEOUT=30000
       - CACHE_TTL=300

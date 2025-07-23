@@ -49,68 +49,6 @@ export async function searchTrains(
   return response.data
 }
 
-// TGV MAX detection patterns
-export const TGV_MAX_PATTERNS = {
-  // Train numbers that typically have TGV MAX availability
-  eligibleTrainNumbers: [
-    /^TGV[0-9]{4}$/,  // Standard TGV trains
-    /^TGV\s?MAX/i,    // Explicitly marked TGV MAX
-  ],
-  
-  // Time slots with better TGV MAX availability
-  preferredTimeSlots: [
-    { start: '10:00', end: '14:00' }, // Mid-day
-    { start: '19:00', end: '22:00' }, // Evening
-  ],
-  
-  // Routes with frequent TGV MAX availability
-  popularRoutes: [
-    ['Paris', 'Lyon'],
-    ['Paris', 'Marseille'],
-    ['Paris', 'Bordeaux'],
-    ['Lyon', 'Marseille'],
-  ],
-}
-
-// Enhanced TGV MAX detection
-export function detectTGVMaxAvailability(
-  train: any,
-  route: { from: string; to: string }
-): boolean {
-  // Check if train type is TGV
-  if (train.type !== 'TGV') {
-    return false
-  }
-
-  // Check train number patterns
-  const matchesPattern = TGV_MAX_PATTERNS.eligibleTrainNumbers.some(pattern =>
-    pattern.test(train.trainNumber)
-  )
-  
-  if (!matchesPattern) {
-    return false
-  }
-
-  // Check time slots (better availability during off-peak hours)
-  const departureHour = parseInt(train.departureTime.split(':')[0])
-  const isOffPeak = 
-    (departureHour >= 10 && departureHour <= 14) ||
-    (departureHour >= 19 && departureHour <= 22)
-
-  // Check if route is popular for TGV MAX
-  const isPopularRoute = TGV_MAX_PATTERNS.popularRoutes.some(([from, to]) =>
-    (route.from.includes(from) && route.to.includes(to)) ||
-    (route.from.includes(to) && route.to.includes(from))
-  )
-
-  // Simulate availability based on multiple factors
-  const availabilityScore = 
-    (isOffPeak ? 0.4 : 0.2) +
-    (isPopularRoute ? 0.3 : 0.1) +
-    (Math.random() * 0.3) // Random factor for realism
-
-  return availabilityScore > 0.5
-}
 
 // Retry logic for API calls
 export async function withRetry<T>(
@@ -167,6 +105,8 @@ export function formatApiError(error: ApiError): string {
       return 'Problème de connexion. Vérifiez votre accès internet.'
     case 'RATE_LIMIT':
       return 'Trop de requêtes. Veuillez patienter quelques instants.'
+    case 'SCRAPING_ERROR':
+      return 'Impossible de récupérer les données depuis SNCF Connect. Le site est peut-être temporairement indisponible.'
     case 'INTERNAL_ERROR':
     default:
       return error.message || 'Une erreur est survenue. Veuillez réessayer.'

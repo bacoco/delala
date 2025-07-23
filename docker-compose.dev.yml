@@ -13,7 +13,6 @@ services:
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
       - WATCHPACK_POLLING=true  # Enable hot reload in Docker
       # Web scraping configuration
-      - NEXT_PUBLIC_USE_MOCK_DATA=true  # Use mock data in dev by default
       - SNCF_CONNECT_HEADLESS=true
       - SNCF_CONNECT_TIMEOUT=30000
       - CACHE_TTL=300
