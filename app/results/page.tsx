@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import axios from 'axios'
-import { TrainSearchResponse, ApiError, Train } from '@/types'
+import { TrainSearchResponse, ApiError } from '@/types'
+import { searchTrains, formatApiError } from '@/lib/api'
 import TrainCard from '@/components/TrainCard'
 import LoadingResults from '@/components/LoadingResults'
 
@@ -35,18 +35,13 @@ function SearchResults() {
       setLoading(true)
       setError(null)
 
-      const response = await axios.get<TrainSearchResponse>('/api/sncf', {
-        params: { from, to, date },
-      })
-
-      setResults(response.data)
+      const response = await searchTrains(from, to, date)
+      setResults(response)
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const apiError = err.response.data as ApiError
-        setError(apiError.message)
-      } else {
-        setError('Une erreur est survenue lors de la recherche')
-      }
+      const errorMessage = err && typeof err === 'object' && 'code' in err
+        ? formatApiError(err as ApiError)
+        : 'Une erreur est survenue lors de la recherche'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

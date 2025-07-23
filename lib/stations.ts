@@ -43,7 +43,7 @@ export const STATIONS_DATA: Station[] = [
   { name: 'Orléans', code: 'FRORL', region: 'Centre-Val de Loire' },
   { name: 'Mulhouse Ville', code: 'FRMUL', region: 'Grand Est' },
   { name: 'Caen', code: 'FRCAE', region: 'Normandie' },
-  { name: 'Brest', code: 'FRBES', region: 'Bretagne' },
+  { name: 'Brest', code: 'FRBRS', region: 'Bretagne' },
   { name: 'Le Havre', code: 'FRLEH', region: 'Normandie' },
   { name: 'Amiens', code: 'FRAMI', region: 'Hauts-de-France' },
   { name: 'Limoges Bénédictins', code: 'FRLIM', region: 'Nouvelle-Aquitaine' },
@@ -63,8 +63,8 @@ export const STATIONS_DATA: Station[] = [
   { name: 'Saint-Malo', code: 'FRSML', region: 'Bretagne' },
   { name: 'Belfort', code: 'FRBEL', region: 'Bourgogne-Franche-Comté' },
   { name: 'Colmar', code: 'FRCMR', region: 'Grand Est' },
-  { name: 'Marne-la-Vallée Chessy', code: 'FRMLV', region: 'Île-de-France' },
-  { name: 'Massy TGV', code: 'FRMTGV', region: 'Île-de-France' },
+  { name: 'Marne-la-Vallée Chessy (Disneyland)', code: 'FRMLV', region: 'Île-de-France' },
+  { name: 'Massy TGV', code: 'FRMTG', region: 'Île-de-France' },
   { name: 'Charles de Gaulle 2 TGV', code: 'FRCDG', region: 'Île-de-France' },
 ]
 

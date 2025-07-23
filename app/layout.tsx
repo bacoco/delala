@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -28,7 +29,9 @@ export default function RootLayout({
           </div>
         </header>
         <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-180px)]">
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </main>
         <footer className="bg-gray-800 text-white p-4 mt-8">
           <div className="container mx-auto text-center text-sm">

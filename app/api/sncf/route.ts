@@ -1,6 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Train, TrainSearchResponse, ApiError } from '@/types'
 import { getStationByName } from '@/lib/stations'
+import { detectTGVMaxAvailability, setCachedData, getCachedData } from '@/lib/api'
+
+// Rate limiting
+const requestCounts = new Map<string, { count: number; resetTime: number }>()
+const RATE_LIMIT = 10 // requests per minute
+const RATE_WINDOW = 60 * 1000 // 1 minute
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const userLimit = requestCounts.get(ip)
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    requestCounts.set(ip, {
+      count: 1,
+      resetTime: now + RATE_WINDOW,
+    })
+    return true
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false
+  }
+  
+  userLimit.count++
+  return true
+}
 
 // Mock train data for prototype
 // In production, this would call actual SNCF API
@@ -19,8 +45,11 @@ function generateMockTrains(from: string, to: string, date: string): Train[] {
     const trainTypes = ['TGV', 'TGV', 'TGV', 'TER', 'Intercités'] // More TGVs
     const trainType = trainTypes[Math.floor(Math.random() * trainTypes.length)]
     
-    // TGV MAX availability (more realistic: only some TGVs have availability)
-    const tgvMaxAvailable = trainType === 'TGV' && Math.random() > 0.7 // 30% of TGVs
+    // Enhanced TGV MAX detection
+    const tgvMaxAvailable = detectTGVMaxAvailability(
+      { type: trainType, trainNumber: `${trainType}${Math.floor(Math.random() * 9000) + 1000}`, departureTime: departureTime.toTimeString().slice(0, 5) },
+      { from, to }
+    )
     
     trains.push({
       trainNumber: `${trainType}${Math.floor(Math.random() * 9000) + 1000}`,
@@ -40,6 +69,18 @@ function generateMockTrains(from: string, to: string, date: string): Train[] {
 
 export async function GET(request: NextRequest) {
   try {
+    // Get client IP for rate limiting
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    
+    // Check rate limit
+    if (!checkRateLimit(ip)) {
+      const error: ApiError = {
+        message: 'Trop de requêtes. Veuillez patienter avant de réessayer.',
+        code: 'RATE_LIMIT',
+      }
+      return NextResponse.json(error, { status: 429 })
+    }
+    
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from')
     const to = searchParams.get('to')
@@ -66,6 +107,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(error, { status: 404 })
     }
 
+    // Check cache first
+    const cacheKey = `trains:${from}:${to}:${date}`
+    const cachedResponse = getCachedData<TrainSearchResponse>(cacheKey)
+    
+    if (cachedResponse) {
+      return NextResponse.json(cachedResponse)
+    }
+    
     // In production, make actual API call here
     // For now, simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800))
@@ -83,6 +132,9 @@ export async function GET(request: NextRequest) {
       },
       totalResults: trains.length,
     }
+
+    // Cache the response
+    setCachedData(cacheKey, response)
 
     return NextResponse.json(response)
   } catch (error) {
