@@ -20,11 +20,11 @@ Cette Web Application a été générée par BACO (Basic Adaptive Context Orches
 - ✅ **Recherche de trains par trajet et date**: Interface intuitive avec autocomplétion des gares (60+ gares françaises)
 - ✅ **Vérification de disponibilité TGV MAX**: Données réelles depuis SNCF Connect (web scraping)
 - ✅ **Affichage détaillé des trains**: Horaires, durée, arrêts, voies et correspondances
-- ✅ **Filtrage avancé des résultats**: Par heure de départ, durée maximale et nombre de correspondances
+- ✅ **Filtrage avancé des résultats**: Par heure de départ, durée maximale, nombre de correspondances et **TGV MAX uniquement**
 - ✅ **Trajets favoris**: Sauvegarde locale avec surnoms personnalisés et accès rapide
 - ✅ **Notifications de disponibilité**: Configuration des alertes par email (interface prototype)
 - ✅ **Support Docker**: Containerisation complète avec Chromium pour le scraping
-- ✅ **Tests complets**: 90 tests unitaires avec couverture complète
+- ✅ **Tests complets**: 94 tests unitaires avec couverture complète
 
 ### 🔥 Données 100% réelles
 L'application récupère les vraies disponibilités TGV MAX directement depuis le site SNCF Connect - pas de données fictives !
@@ -263,6 +263,7 @@ Ce projet a été développé en 4 phases sur 1 semaine :
 - ✅ Extraction des vraies disponibilités TGV MAX
 - ✅ Support Docker avec Chromium
 - ✅ Suppression complète des données fictives
+- ✅ Filtre TGV MAX uniquement avec bouton rapide
 
 ## 🎯 Points Techniques Notables
 
