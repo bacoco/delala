@@ -1,8 +1,46 @@
 # API Integration Guide
 
-This application currently uses **mock data** to demonstrate functionality. To get real SNCF train schedules, you need to integrate with one of the following APIs:
+This application now supports **real TGV MAX availability data** through web scraping! You can also integrate with various APIs for additional features.
 
-## Option 1: Navitia.io (Recommended)
+## Option 0: Web Scraping (NEW! - Real TGV MAX Data)
+
+Get actual TGV MAX availability directly from SNCF Connect website.
+
+### Setup:
+1. Copy `.env.example` to `.env`
+2. Set `NEXT_PUBLIC_USE_MOCK_DATA=false`
+3. Restart the application
+
+### Configuration:
+```env
+# Enable real data scraping
+NEXT_PUBLIC_USE_MOCK_DATA=false
+
+# Scraper settings
+SNCF_CONNECT_HEADLESS=true      # Run browser in headless mode
+SNCF_CONNECT_TIMEOUT=30000      # Page load timeout (ms)
+CACHE_TTL=300                   # Cache duration (seconds)
+```
+
+### Features:
+- ✅ Real TGV MAX availability badges
+- ✅ Actual train schedules and prices
+- ✅ Automatic fallback to mock data on errors
+- ✅ 5-minute result caching
+- ✅ Docker support with Chromium included
+
+### How it works:
+1. Uses Puppeteer to automate a headless Chrome browser
+2. Navigates to SNCF Connect and fills the search form
+3. Extracts train data including TGV MAX availability
+4. Caches results to minimize requests
+
+### Limitations:
+- Slower than API calls (10-15 seconds per search)
+- May break if SNCF Connect changes their website
+- Rate limiting recommended to avoid being blocked
+
+## Option 1: Navitia.io (API Alternative)
 
 Navitia provides comprehensive public transport data including real-time information.
 

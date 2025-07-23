@@ -18,13 +18,16 @@ Cette Web Application a été générée par BACO (Basic Adaptive Context Orches
 ## ✨ Features
 
 - ✅ **Recherche de trains par trajet et date**: Interface intuitive avec autocomplétion des gares (60+ gares françaises)
-- ✅ **Vérification de disponibilité TGV MAX**: Indicateurs visuels clairs avec badges colorés
+- ✅ **Vérification de disponibilité TGV MAX**: Données réelles depuis SNCF Connect (web scraping)
 - ✅ **Affichage détaillé des trains**: Horaires, durée, arrêts, voies et correspondances
 - ✅ **Filtrage avancé des résultats**: Par heure de départ, durée maximale et nombre de correspondances
 - ✅ **Trajets favoris**: Sauvegarde locale avec surnoms personnalisés et accès rapide
 - ✅ **Notifications de disponibilité**: Configuration des alertes par email (interface prototype)
-- ✅ **Support Docker**: Containerisation complète pour développement et production
+- ✅ **Support Docker**: Containerisation complète avec Chromium pour le scraping
 - ✅ **Tests complets**: 90 tests unitaires avec couverture complète
+
+### 🆕 Données réelles TGV MAX
+L'application peut maintenant récupérer les vraies disponibilités TGV MAX directement depuis le site SNCF Connect !
 
 ## 🏃‍♂️ Quick Start
 
@@ -45,7 +48,9 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your SNCF API configuration
+
+# For real TGV MAX data (recommended):
+# Edit .env and set NEXT_PUBLIC_USE_MOCK_DATA=false
 
 # Run development server
 npm run dev
@@ -256,14 +261,22 @@ Ce projet a été développé en 4 phases sur 1 semaine :
 - ✅ Documentation exhaustive
 - ✅ 90 tests unitaires au total
 
+### Phase 5: Real Data Integration (Day 8)
+- ✅ Web scraping avec Puppeteer
+- ✅ Extraction des vraies disponibilités TGV MAX
+- ✅ Support Docker avec Chromium
+- ✅ Fallback automatique sur mock data
+
 ## 🎯 Points Techniques Notables
 
+- **Web Scraping intelligent** : Puppeteer avec Chromium headless pour données réelles
 - **Autocomplétion performante** : Recherche fuzzy avec normalisation des accents
 - **Gestion d'état locale** : localStorage pour persistence offline
-- **Détection TGV MAX** : Algorithme basé sur patterns de prix et types de trains
-- **Rate limiting** : Protection API avec cache de 5 minutes
-- **Error boundaries** : Gestion gracieuse des erreurs
+- **Détection TGV MAX réelle** : Extraction directe depuis SNCF Connect
+- **Rate limiting** : Protection API avec cache configurable
+- **Error boundaries** : Gestion gracieuse des erreurs avec fallback
 - **Responsive design** : Mobile-first avec breakpoints Tailwind
+- **Docker optimisé** : Multi-stage build avec support Chromium intégré
 
 ---
 

@@ -3,7 +3,22 @@ FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+
+# Install Puppeteer dependencies
+RUN apk add --no-cache \
+    libc6-compat \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Tell Puppeteer to use installed Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 WORKDIR /app
 
 # Copy package files
@@ -28,10 +43,22 @@ RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
+
+# Install runtime dependencies for Puppeteer
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
 WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Train, TrainSearchResponse, ApiError } from '@/types'
 import { getStationByName } from '@/lib/stations'
 import { detectTGVMaxAvailability, setCachedData, getCachedData } from '@/lib/api'
+import { scrapeTrains } from '@/lib/services/sncf-connect-scraper'
 
 // Rate limiting
 const requestCounts = new Map<string, { count: number; resetTime: number }>()
@@ -115,12 +116,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedResponse)
     }
     
-    // In production, make actual API call here
-    // For now, simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800))
-
-    // Generate mock data
-    const trains = generateMockTrains(from, to, date)
+    let trains: Train[] = []
+    
+    // Use real data if not in mock mode
+    if (process.env.NEXT_PUBLIC_USE_MOCK_DATA !== 'true') {
+      try {
+        console.log('Scraping real data from SNCF Connect...')
+        trains = await scrapeTrains(departureStation, arrivalStation, new Date(date))
+        console.log(`Found ${trains.length} trains with real TGV MAX availability`)
+      } catch (scrapingError) {
+        console.error('Scraping failed, falling back to mock data:', scrapingError)
+        // Fall back to mock data on error
+        trains = generateMockTrains(from, to, date)
+      }
+    } else {
+      // Use mock data in development/prototype mode
+      await new Promise(resolve => setTimeout(resolve, 800))
+      trains = generateMockTrains(from, to, date)
+    }
 
     const response: TrainSearchResponse = {
       trains,
