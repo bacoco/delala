@@ -1,5 +1,6 @@
 import SearchForm from '@/components/SearchForm'
 import FavoriteRoutes from '@/components/FavoriteRoutes'
+import NotificationSetup from '@/components/NotificationSetup'
 
 export default function Home() {
   return (
@@ -17,8 +18,9 @@ export default function Home() {
         <div className="md:col-span-2">
           <SearchForm />
         </div>
-        <div className="md:col-span-1">
+        <div className="md:col-span-1 space-y-6">
           <FavoriteRoutes />
+          <NotificationSetup />
         </div>
       </div>
 

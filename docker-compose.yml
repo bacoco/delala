@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_APP_NAME=TGV MAX Checker
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      # Add your SNCF API credentials here or use .env file
+      # - SNCF_API_KEY=your_api_key_here
+      # - SNCF_API_URL=https://api.sncf.com/v1/coverage/sncf
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
