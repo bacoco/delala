@@ -64,6 +64,9 @@ tmp/
 temp/
 *.tmp
 
+# Test scripts
+test-scraper.js
+
 # Package lock files (keep one based on preference)
 # For this project, we'll use npm
 yarn.lock
